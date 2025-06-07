@@ -1,0 +1,72 @@
+here first you need to activate the virtual environment and then start doing the project.
+
+you can create virtual environment by python -m venv name
+then activate it by name\Scripts\activate
+
+after finishing you can deactivate it by --->deactivate<---
+
+this helps a lot for performing python project
+here you need to install eel module, which helps to connect between the frontend(webD) and backend(Python).
+
+also install required modules used in project
+
+
+
+
+
+SETUP of AI feature:(steps to be followed)
+
+option1:(mistral-7b-openorca.Q4_0.gguf)
+
+from gpt4all import GPT4All
+# Model will auto-download if not found
+model = GPT4All(
+    model_name='mistral-7b-openorca.Q4_0.gguf',
+    model_path='./models/',  # Save to your project folder
+    allow_download=True
+)
+
+@eel.expose
+def chatBot(query):
+    try:
+        response = model.generate(
+            prompt=query,
+            max_tokens=200,
+            temp=0.7  # Creativity control
+        )
+        return response
+    except Exception as e:
+        return f"Error: {e}"
+
+option2:(Ollama)
+
+# Windows (via Winget)
+winget install ollama.ollama
+
+ollama pull tinyllama    # 1.1GB, fast on CPU
+ollama pull phi3         # 3.8GB, better quality
+ollama pull mistral:7b   # 4.1GB, best balance
+
+import ollama
+@eel.expose
+def chatBot(query):
+    try:
+        # Generate response from Ollama
+        response = ollama.chat(
+            model='mistral',  # Change to 'tinyllama' or 'phi3' if needed
+            messages=[{'role': 'user', 'content': query}],
+            options={
+                'temperature': 0.7,  # Controls creativity (0=strict, 1=random)
+                'num_ctx': 2048      # Memory size (higher = remembers more)
+            }
+        )
+        reply = response['message']['content']
+        return reply
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+# Keep Ollama running in a separate terminal
+ollama serve
+
+# Then start your JARVIS app normally
+python run.py
